@@ -1,0 +1,4 @@
+export(print.TableMonster)
+import(xtable)
+S3method(print, TableMonster)
+S3method(as.data.frame, TableMonster)
