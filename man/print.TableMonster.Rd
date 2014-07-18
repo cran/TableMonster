@@ -9,7 +9,10 @@
 }
 \arguments{
   \item{x}{an object of class 'TableMonster' -- see below}
-  \item{\dots}{additional arguments -- currently unused}
+  \item{\dots}{Optionally, \code{label}, of type character, giving the
+    name of the latex label name associated with the table for
+    crossreference within the latex document. Also, any named arguments
+    accepted by \code{print.xtable}}
 }
 \author{Grant Izmirlian}
 
@@ -28,6 +31,9 @@ attr(tst,"digits") <- rep(0,3)
 attr(tst,"caption")<-"This is JUST a TEST"
 class(tst) <- "TableMonster"
 tst
+print(tst, label="tbl:anexample")
+print(tst, include.rownames=FALSE, sanitize.text.function=I)
+print(tst, label="tbl:anexample", include.rownames=FALSE, sanitize.text.function=I)
 
 ## Example 2: A table with a two level heading
 ##

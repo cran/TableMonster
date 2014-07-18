@@ -1,5 +1,5 @@
 Package: TableMonster
-Version: 1.1
+Version: 1.2
 Depends: xtable
 Date: 2014-07-18
 Title: Table Monster
@@ -9,7 +9,7 @@ Description: Provides a user friendly interface to generation of booktab style
   tables using xtable. 
 License: GPL (>= 2)
 LazyLoad: yes
-Packaged: 2014-07-21 17:14:28 UTC; izmirlig
+Packaged: 2015-02-03 01:40:57 UTC; izmirlig
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-07-21 20:07:51
+Date/Publication: 2015-02-06 00:36:01

@@ -3,6 +3,12 @@
 "print.TableMonster" <-
 function(x, ...)
 {
+  m <- match.call()
+  ddd <- list()
+  nmsddd <- names(m)[-(1:2)]
+  n.ddd <- length(nmsddd)
+  if(n.ddd>0) for(k in 1:n.ddd) ddd[[nmsddd[k]]] <- m[[2+k]]
+    
   x.df <- as.data.frame(x)
   nr <- nrow(x.df)
   nc <- ncol(x.df)
@@ -93,9 +99,28 @@ function(x, ...)
   
   caption <- attr(x, "caption")
   
-  xtbl <- xtable(as.data.frame(x), digits=c(0,digits), align="ll" %,% paste(rep("r",nc-1), collapse=""), caption=caption)
-  print(xtbl, hline.after=NULL, add.to.row=add.to.row, include.rownames=FALSE, include.colnames=FALSE, 
-        type="latex", sanitize.text.function=function(x)x, sanitize.rownames.function=function(x)x)
+  xtbl.call <- as.call(expression(xtable, as.data.frame(x), digits=c(0,digits), align="ll" %,% paste(rep("r",nc-1), collapse=""), caption=caption))
+  pr.xtbl.call <- as.call(expression(print, xtbl, hline.after=NULL, add.to.row=add.to.row, include.rownames=FALSE, include.colnames=FALSE, 
+                                     type="latex"))
+
+  if(n.ddd > 0)
+  {
+    lbl.idx <- grep("label", nmsddd)
+    is.lbl <- (length(lbl.idx) > 0)
+    if(is.lbl)
+    {
+      lbl.val <- ddd[[lbl.idx]]
+      ddd <- ddd[-lbl.idx]
+      n.ddd <- n.ddd - 1
+      nmsddd <- names(ddd)
+      xtbl.call[["label"]] <- lbl.val
+    }
+    is.ddd <- (n.ddd>0)
+    if(is.ddd) for(k in 1:n.ddd) pr.xtbl.call[[nmsddd[k]]] <- ddd[[nmsddd[k]]]
+  }
+  
+  xtbl <- eval(xtbl.call)
+  eval(pr.xtbl.call)
 }
 
 "as.data.frame.TableMonster" <-
