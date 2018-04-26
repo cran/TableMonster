@@ -1,4 +1,6 @@
-export(print.TableMonster)
+export("print.TableMonster", "tmHeadings", "tmCtypes", "tmDigits", "tmCaption", "tmTotals",
+                             "tmHeadings<-", "tmCtypes<-", "tmDigits<-", "tmCaption<-", "tmTotals<-")
+                           
 import(xtable)
 S3method(print, TableMonster)
 S3method(as.data.frame, TableMonster)

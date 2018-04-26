@@ -1,15 +1,14 @@
 Package: TableMonster
-Version: 1.2
+Version: 1.7
 Depends: xtable
-Date: 2014-07-18
 Title: Table Monster
 Author: Grant Izmirlian Jr <izmirlig@mail.nih.gov>
 Maintainer: Grant Izmirlian Jr <izmirlig@mail.nih.gov>
-Description: Provides a user friendly interface to generation of booktab style
-  tables using xtable. 
+Description: Provides a user friendly interface to 
+  generation of booktab style tables using 'xtable'. 
+URL: <https://www.youtube.com/watch?v=CM1TaNVnh58>
 License: GPL (>= 2)
-LazyLoad: yes
-Packaged: 2015-02-03 01:40:57 UTC; izmirlig
 NeedsCompilation: no
+Packaged: 2018-04-26 21:24:36 UTC; izmirlig
 Repository: CRAN
-Date/Publication: 2015-02-06 00:36:01
+Date/Publication: 2018-04-26 21:49:08 UTC
