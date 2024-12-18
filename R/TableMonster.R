@@ -1,8 +1,17 @@
-"%,%" <- function(x,y)paste(x,y,sep="")
+"%,%" <- function(x,y)paste0(x,y)
 
-"print.TableMonster" <- 
+"if.na.x" <- function (x, x0 = FALSE) 
+{
+    d.x <- dim(x)
+    x. <- c(as.matrix(x))
+    y <- rep(x0, length(x.))
+    y[!is.na(x.)] <- x.[!is.na(x.)]
+    structure(y, dim = d.x)
+}
+"print.TableMonster" <-
 function (x, special = NULL, simple = FALSE, dbg = FALSE, ...) 
 {
+    if(dbg) browser()
     spcl <- FALSE
     spcl.val <- NULL
     if (!missing(special)) {
@@ -19,13 +28,12 @@ function (x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     x.df <- as.data.frame(x)
     nr <- nrow(x.df)
     nc <- ncol(x.df)
-    headings <- attr(x, "headings")
-    ctypes <- attr(x, "ctypes")
-    digits <- attr(x, "digits")
-    displ <- attr(x, "display")
-    rowcolor <- attr(x, "rowcolor")
-    caption <- attr(x, "caption")
-    totals <- attr(x, "totals")
+    headings <- tmHeadings(x)
+    ctypes <- tmCtypes(x)
+    digits <- tmDigits(x)
+    displ <- tmDisplay(x)
+    caption <- tmCaption(x)
+    totals <- tmTotals(x)
 
     rc.idx <- grep("rowcolor", nmsddd)
     is.rc <- (length(rc.idx) > 0)
@@ -48,65 +56,34 @@ function (x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     }
     is.tot <- !is.null(totals)
     if (is.tot) 
-        if (!is.logical(totals)) 
-            stop("Attribute 'totals' must be logical")
-    n.h <- length(headings)
-    depth <- rep(1, n.h)
-    lngths <- NULL
-    for (k in 1:n.h) {
-        ptr1 <- ptr0 <- headings[[k]]
-        if (!is.null(names(ptr1))) {
-            ptr0 <- ptr1
-            depth[k] <- depth[k] + 1
-            ptr1 <- ptr0[[1]]
-        }
-        lnptr <- length(ptr0)
-        lngths <- c(lngths, lnptr)
-    }
+      if (!is.logical(totals)) 
+          stop("Attribute 'totals' must be logical")
+    ### new tricks !!! ### quickly get names of leaves and parents, and number of children per parent from headings tree.
+    ### works for arbitrary two level headings 
+    leaves <- sapply(strsplit(names(unlist(headings, recursive=TRUE)), split=".", fixed=TRUE), FUN=function(x)x[length(x)])
+    o <- unique(sapply(strsplit(names(unlist(headings, recursive=TRUE)), split=".", fixed=TRUE), FUN=function(x)x[1]))
+    parents <- if.na.x(xtabs(~sapply(strsplit(names(unlist(headings, recursive=TRUE)), split=".", fixed=TRUE),
+                                     FUN=function(x)x[1]))[o],1)
+    names(parents) <- o
+    n.h <- length(parents)
+    depth <- 0*parents + 1
+    is.dpth2 <- setdiff(names(parents), leaves)
+    depth[is.dpth2] <- 2
     mxdpth <- max(depth)
     atmxdpth <- which(depth == mxdpth)
-    for (k in 1:n.h) {
-        j <- mxdpth - depth[k]
-        out <- headings[[k]]
-        while (j > 0) {
-            out <- list(` ` = out)
-            names(out) <- names(headings)[k]
-            j <- j - 1
-        }
-        headings[[k]] <- out
-    }
-    
-    hdr <- list()
-    hdr[[1]] <- names(headings[atmxdpth])
-    n.hdr.1 <- length(hdr[[1]])
-    if (mxdpth > 1)
-    {
-        nms.ul.hdngs <- names(unlist(headings))
-        nchr <- nchar(nms.ul.hdngs)
-        nchr.hlf <- (nchr-1)/2
-        frst <- substring(nms.ul.hdngs, 1, nchr.hlf)
-        scnd <- substring(nms.ul.hdngs, nchr.hlf+2, nchr)
-        idx.rpts <- which(frst==scnd)
-        nms.ul.hdngs[idx.rpts] <- frst[idx.rpts]
-        for(k in 1:n.hdr.1)
-        {
-          grp.hdr1.k <- grep(hdr[[1]][k], nms.ul.hdngs)
-          nms.ul.hdngs[grp.hdr1.k] <- substring(nms.ul.hdngs[grp.hdr1.k], nchar(hdr[[1]][k])+2, nchar(nms.ul.hdngs[grp.hdr1.k]))
-        }
-        hdr[[mxdpth]] <- nms.ul.hdngs
-    }
+    dpth2 <- any(parents>1)
+    ### end ##############
     h1 <- h1a <- NULL
-    dpth2 <- any(depth > 1)
     if (dpth2) 
         simple <- FALSE
     if (dpth2) {
         h1 <- h1a <- NULL
-        h1[atmxdpth] <- "\\multicolumn{" %,% lngths[atmxdpth[1]] %,% 
-            "}{c}{" %,% hdr[[1]] %,% "}"
+        fff <- function(i, lns, nms) ifelse(lns[i]>1, "\\multicolumn{" %,% lns[i] %,% 
+            "}{c}{" %,% nms[i] %,% "}", nms[i])
+        h1[atmxdpth] <- sapply(atmxdpth, FUN=fff, lns=parents, nms=names(parents))
         h1[setdiff(1:n.h, atmxdpth)] <- ""
         h1 <- paste(h1, collapse = "&") %,% "\\\\\n"
-        nc1 <- length(hdr[[1]])
-        tt <- cumsum(lngths)
+        tt <- cumsum(parents)
         i0 <- tt[atmxdpth - 1] + 1
         i1 <- tt[atmxdpth]
         ni <- length(i0)
@@ -115,15 +92,19 @@ function (x, special = NULL, simple = FALSE, dbg = FALSE, ...)
         sfx <- "\n"
         if(ni>1)
         {
-          k.k <- apply(cbind(i0, i1)[2:(ni - 1), , drop = FALSE], 
-                       1, FUN = function(x) x[1] %,% "-" %,% x[2])
-          bdy <- paste("\\cmidrule(lr){" %,% k.k, collapse = "}")
-          sfx <- "}\\cmidrule(l){" %,% i0[ni] %,% "-" %,% i1[ni] %,% "}\n"
+          bdy <- NULL
+          if(ni>2)
+          {      
+            k.k <- apply(cbind(i0, i1)[2:(ni - 1), , drop = FALSE], 
+                         1, FUN = function(x) x[1] %,% "-" %,% x[2])
+            bdy <- paste("\\cmidrule(lr){" %,% k.k, collapse = "}") %,% "}"
+          }
+          sfx <- "\\cmidrule(l){" %,% i0[ni] %,% "-" %,% i1[ni] %,% "}\n"
         }
         h1a <- prfx %,% bdy %,% sfx
     }
-    h2 <- paste(hdr[[mxdpth]], collapse = "&") %,% "\\\\\n"
-    nc2 <- length(hdr[[mxdpth]])
+    h2 <- paste(leaves, collapse = "&") %,% "\\\\\n"
+    nc2 <- length(leaves)
     prfx <- "\\cmidrule(r){" %,% 1 %,% "-" %,% 1 %,% "}"
     k.k <- sapply(2:(nc2 - 1), FUN = function(x) x %,% "-" %,% 
         x)
@@ -263,7 +244,39 @@ function (x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     eval(pr.xtbl.call)
 }
 
-
+"basic.tmPrint" <-
+function(x, special = NULL, simple = FALSE, dbg = FALSE, ...)
+{
+    mc <- match.call()
+    is.cptn <- any(names(mc)=="cptn")
+    is.lbl <- any(names(mc)=="lbl")
+    nc <- ncol(x)
+    m <- dt <- ct <- NULL
+    lgnd1 <- c(`numeric`="numeric",`factor`="character",`character`="character")
+    lgnd2 <- c(`dbl`="n",`int`="n",`c`="c")
+    for(k in 1:nc)
+    {
+      m <- c(m, lgnd1[class(x[,k])])
+      dt <- c(dt, 
+      switch(m[k],
+             "numeric"=ifelse(all(round(x[,k])==x[,k]), "int", "dbl"),
+             "character"="c"
+             ))
+      ct <- lgnd2[dt]
+    }
+    dig <- c(`dbl`=3, `int`=0, `c`=0)
+    hdr <- as.list(rep("", nc))
+    names(hdr) <- names(x)
+    tmHeadings(x) <- hdr
+    tmCtypes(x) <- ct
+    tmDigits(x) <- dig[dt]
+    if(is.cptn) tmCaption(x) <- eval(mc$cptn)
+    class(x) <- "TableMonster"
+    pr.call <- as.call(expression(print, x))
+    if(is.lbl) pr.call$label <- eval(mc$lbl)
+    eval(pr.call)
+}
+    
 "as.data.frame.TableMonster" <-
 function(x, row.names = NULL, optional = FALSE, ...)
 {
@@ -294,16 +307,22 @@ function(x)
   attr(x, "digits")
 }
 
-"tmTotals" <- 
+"tmTotals" <-
 function(x)
 {
   attr(x, "totals")
 }
 
-"tmCaption" <- 
+"tmCaption" <-
 function(x)
 {
   attr(x, "caption")
+}
+
+"tmDisplay" <-
+function(x)
+{
+  attr(x, "display")
 }
 
 "tmHeadings<-" <-
@@ -327,17 +346,24 @@ function(x, value)
   x
 }
 
-"tmTotals<-" <- 
+"tmTotals<-" <-
 function(x, value)
 {
   attr(x, "totals") <- value
   x
 }
 
-"tmCaption<-" <- 
+"tmCaption<-" <-
 function(x, value)
 {
   attr(x, "caption") <- value
+  x
+}
+
+"tmDisplay<-" <-
+function(x, value)
+{
+  attr(x, "display") <- value
   x
 }
 

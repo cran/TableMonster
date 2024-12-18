@@ -19,8 +19,8 @@
   This is a required attribute for an object of class 'TableMonster'
 }
 \value{
-  A character vector of length \# columns of the table having
-  entries "n" or "c", meaning "numeric" or "character"
+  A character vector the same length as the number of columns of the
+  table, having entries "n" or "c", meaning "numeric" or "character"
 }
 \author{Grant Izmirlian}
 \references{

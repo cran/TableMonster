@@ -16,7 +16,7 @@
   }
 }
 \details{
-  This attribute is optional an is only used when you have a table
+  This attribute is optional and is only used when you have a table
   in which you want to put a single row of column totals (or anything
   else) below the bottom line.
 }
