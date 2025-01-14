@@ -238,7 +238,8 @@ function (x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     if(is.rc)
     {
       cat(sprintf("%s\n", "%% Don't forget to \\usepackage{xcolor} and include 'table' in your documentclass options, "))
-      cat(sprintf("%s\n", "%% e.g. \\documentclass[table]{beamer}, and remember to define the color, " %,% clr %,% ", in your preamble"))
+      cat(sprintf("%s\n", "%% e.g. \\documentclass[table]{beamer}, and remember to define the color, " %,% clr %,%
+                          ", in your preamble"))
     }
     xtbl <- eval(xtbl.call)
     eval(pr.xtbl.call)
@@ -252,7 +253,7 @@ function(x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     is.lbl <- any(names(mc)=="lbl")
     nc <- ncol(x)
     m <- dt <- ct <- NULL
-    lgnd1 <- c(`numeric`="numeric",`factor`="character",`character`="character")
+    lgnd1 <- c(`numeric`="numeric",`integer`="integer", `factor`="character",`AsIs`="character", `character`="character")
     lgnd2 <- c(`dbl`="n",`int`="n",`c`="c")
     for(k in 1:nc)
     {
@@ -260,6 +261,7 @@ function(x, special = NULL, simple = FALSE, dbg = FALSE, ...)
       dt <- c(dt, 
       switch(m[k],
              "numeric"=ifelse(all(round(x[,k])==x[,k]), "int", "dbl"),
+             "integer"="int",
              "character"="c"
              ))
       ct <- lgnd2[dt]
@@ -274,6 +276,7 @@ function(x, special = NULL, simple = FALSE, dbg = FALSE, ...)
     class(x) <- "TableMonster"
     pr.call <- as.call(expression(print, x))
     if(is.lbl) pr.call$label <- eval(mc$lbl)
+    pr.call$sanitize.text.function <- I
     eval(pr.call)
 }
     
