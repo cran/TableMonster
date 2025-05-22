@@ -5,10 +5,15 @@
 \description{Provides a user friendly interface to generation of booktab style
   tables using xtable.}
 \usage{
-\method{print}{TableMonster}(x, special = NULL, simple = FALSE, dbg = FALSE, ...)
+\method{print}{TableMonster}(x, extra = NULL, special = NULL, simple = FALSE, dbg = FALSE, ...)
 }
 \arguments{
   \item{x}{an object of class 'TableMonster' -- see below}
+  \item{extra}{If you want a solid line (tr) or centered midlines (cr) anywhere in
+    the body of the table then use this list argument, with a 'tl' for
+    each solid and a 'mr' for each centered midline in the same format
+    ast the top, e.g.  extra=list(tr=11, cr=13) will put one of each
+    after body lines 11 and 13.}
   \item{special}{Optionally, one of the following: 'aos' or 'jrss-b', to
     produce tables compatible with the style guid of the Annals of
     Statistics or JRSS-B, respectively.}
@@ -29,10 +34,7 @@
     Finally, any named arguments accepted by \code{print.xtable}
     are accepted.}
 }
-\author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}
+\author{Grant Izmirlian \email{izmirlian@astrazeneca.com}}
 \examples{
 ## Example 1: A table with a single heading
 ##

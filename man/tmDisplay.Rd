@@ -25,6 +25,4 @@
   '"g"', '"G"', '"fg"' (for reals), or '"s"' (for strings).
 }
 \author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}
+

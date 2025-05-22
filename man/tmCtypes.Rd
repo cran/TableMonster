@@ -23,6 +23,4 @@
   table, having entries "n" or "c", meaning "numeric" or "character"
 }
 \author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}
+

@@ -23,6 +23,3 @@
   This is a required attribute for an object of class 'TableMonster'
 }
 \author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}

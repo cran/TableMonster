@@ -21,6 +21,4 @@
   A numeric vector of length equal to the number of columns in the table
 }
 \author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}
+

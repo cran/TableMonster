@@ -14,7 +14,7 @@ x \%,\% y
 \value{
   The concatenated character string 
 }
-\author{Grant Izmirlian \email{izmirlian@nih.gov}}
+\author{Grant Izmirlian \email{grant.izmirlian@astrazeneca.com}}
 
 \examples{
   "var" \%,\% (1:10)

@@ -25,6 +25,3 @@
   the format type for each column as other than "g" (general format).
 }
 \author{Grant Izmirlian}
-\references{
-  <https://www.youtube.com/watch?v=CM1TaNVnh58>
-}
